@@ -28,7 +28,9 @@
     "tsc": "rm -rf dist && tsc",
     "prepublishOnly": "npm run tsc && chmod +x dist/stdio.js",
     "smithery-dev": "npx @smithery/cli dev",
-    "start": "npm run tsc && node dist/httpServer.js"
+    "start": "npm run tsc && node dist/httpServer.js",
+    "web": "npm run tsc && node dist/webServer.js",
+    "dev:web": "tsx src/webServer.ts"
   },
   "bin": {
     "bazi-mcp": "./dist/stdio.js"
