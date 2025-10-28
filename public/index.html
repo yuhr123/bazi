@@ -364,56 +364,15 @@
           <!-- 农历日期输入 -->
           <div id="lunarInputGroup" class="date-input-group">
             <div class="form-group">
-              <label for="lunarYear">农历年份 *</label>
+              <label for="lunarDatetime">农历日期时间 *</label>
               <input
-                type="number"
-                id="lunarYear"
-                name="lunarYear"
-                placeholder="例如：2000"
-                min="1900"
-                max="2100"
+                type="datetime-local"
+                id="lunarDatetime"
+                name="lunarDatetime"
+                placeholder="选择农历日期和时间"
               />
+              <div class="example-text">示例：农历 2000年5月15日 12:00（注意：这里输入的是农历的年月日）</div>
             </div>
-            <div class="form-group">
-              <label for="lunarMonth">农历月份 *</label>
-              <input
-                type="number"
-                id="lunarMonth"
-                name="lunarMonth"
-                placeholder="1-12"
-                min="1"
-                max="12"
-              />
-            </div>
-            <div class="form-group">
-              <label for="lunarDay">农历日期 *</label>
-              <input type="number" id="lunarDay" name="lunarDay" placeholder="1-30" min="1" max="30" />
-            </div>
-            <div class="form-group">
-              <label for="lunarHour">时辰（小时）*</label>
-              <input
-                type="number"
-                id="lunarHour"
-                name="lunarHour"
-                placeholder="0-23"
-                min="0"
-                max="23"
-                value="12"
-              />
-            </div>
-            <div class="form-group">
-              <label for="lunarMinute">分钟</label>
-              <input
-                type="number"
-                id="lunarMinute"
-                name="lunarMinute"
-                placeholder="0-59"
-                min="0"
-                max="59"
-                value="0"
-              />
-            </div>
-            <div class="example-text">示例：农历 2000年 5月 15日 12:00</div>
           </div>
 
           <!-- 性别选择 -->
@@ -520,22 +479,13 @@
           // datetime-local 的值格式为: "YYYY-MM-DDTHH:mm"
           requestData.solarDatetime = solarDatetime + ':00+08:00';
         } else {
-          const year = document.getElementById('lunarYear').value;
-          const month = document.getElementById('lunarMonth').value;
-          const day = document.getElementById('lunarDay').value;
-          const hour = document.getElementById('lunarHour').value;
-          const minute = document.getElementById('lunarMinute').value;
-
-          if (!year || !month || !day || !hour) {
-            showError('请填写完整的农历日期时间');
+          const lunarDatetime = document.getElementById('lunarDatetime').value;
+          if (!lunarDatetime) {
+            showError('请选择农历日期时间');
             return;
           }
-
-          // 构建农历时间字符串
-          requestData.lunarDatetime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} ${hour.padStart(
-            2,
-            '0'
-          )}:${minute.padStart(2, '0')}:00`;
+          // 农历时间格式转换：从 "YYYY-MM-DDTHH:mm" 转为 "YYYY-MM-DD HH:mm:ss"
+          requestData.lunarDatetime = lunarDatetime.replace('T', ' ') + ':00';
         }
 
         // 显示加载状态
