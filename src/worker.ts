@@ -57,28 +57,29 @@ const HTML_CONTENT = `<!DOCTYPE html>
         margin-bottom: 20px;
       }
 
-      label {
+      .form-group label {
         display: block;
         margin-bottom: 8px;
         font-weight: 600;
         color: #555;
+        font-size: 14px;
       }
 
-      input[type='text'],
-      input[type='datetime-local'],
-      select {
+      .form-group input,
+      .form-group select {
         width: 100%;
         padding: 12px;
         border: 2px solid #e0e0e0;
         border-radius: 8px;
-        font-size: 1em;
-        transition: border-color 0.3s;
+        font-size: 14px;
+        transition: all 0.3s;
       }
 
-      input:focus,
-      select:focus {
+      .form-group input:focus,
+      .form-group select:focus {
         outline: none;
         border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       }
 
       .radio-group {
@@ -87,144 +88,235 @@ const HTML_CONTENT = `<!DOCTYPE html>
         margin-top: 8px;
       }
 
-      .radio-group label {
+      .radio-item {
         display: flex;
         align-items: center;
-        font-weight: normal;
         cursor: pointer;
       }
 
-      .radio-group input[type='radio'] {
+      .radio-item input[type='radio'] {
         width: auto;
-        margin-right: 8px;
+        margin-right: 6px;
+        cursor: pointer;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
       }
 
       button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 14px 32px;
+        flex: 1;
+        padding: 14px 30px;
+        font-size: 16px;
+        font-weight: 600;
         border: none;
         border-radius: 8px;
-        font-size: 1.1em;
-        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        width: 100%;
+        transition: all 0.3s;
       }
 
-      button:hover {
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
       }
 
-      button:active {
-        transform: translateY(0);
+      .btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-copy {
+        background: #4caf50;
+        color: white;
+      }
+
+      .btn-copy:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-download {
+        background: #ff9800;
+        color: white;
+      }
+
+      .btn-download:hover {
+        background: #f57c00;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
       }
 
       button:disabled {
-        background: #ccc;
+        opacity: 0.6;
         cursor: not-allowed;
-        transform: none;
+        transform: none !important;
       }
 
-      .result {
+      .result-section {
         display: none;
-        animation: fadeIn 0.5s;
       }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .result.show {
+      .result-section.show {
         display: block;
       }
 
-      .result h2 {
-        color: #667eea;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #e0e0e0;
-      }
-
-      .bazi-info {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
-      }
-
-      .info-item {
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-      }
-
-      .info-item strong {
-        color: #555;
-        display: block;
-        margin-bottom: 5px;
-      }
-
-      .pillars {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-        margin: 20px 0;
-      }
-
-      .pillar {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        border-radius: 12px;
-        border: 2px solid #667eea30;
-      }
-
-      .pillar h3 {
-        color: #667eea;
+      .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 15px;
-        font-size: 1.2em;
       }
 
-      .pillar-char {
-        font-size: 2em;
-        font-weight: bold;
-        color: #333;
-        margin: 10px 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      .result-header h2 {
+        color: #667eea;
+        font-size: 1.5em;
       }
 
-      .error {
-        background: #fee;
-        color: #c33;
+      .result-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .result-actions button {
+        flex: none;
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+
+      .json-output {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-x: auto;
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
         padding: 15px;
         border-radius: 8px;
-        border-left: 4px solid #c33;
+        border-left: 4px solid #c62828;
         margin-top: 20px;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
       }
 
       .loading {
         text-align: center;
         padding: 20px;
-        color: #667eea;
+        display: none;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #1565c0;
+      }
+
+      .date-input-group {
+        display: none;
+      }
+
+      .date-input-group.active {
+        display: block;
+      }
+
+      .example-text {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+      }
+
+      .footer {
+        text-align: center;
+        color: white;
+        margin-top: 30px;
+        opacity: 0.9;
+      }
+
+      .footer a {
+        color: white;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .footer a:hover {
+        border-bottom-color: white;
       }
 
       @media (max-width: 768px) {
-        .pillars {
-          grid-template-columns: repeat(2, 1fr);
+        .header h1 {
+          font-size: 1.8em;
         }
 
-        .header h1 {
-          font-size: 2em;
+        .card {
+          padding: 20px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        .result-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+        }
+
+        .result-actions {
+          width: 100%;
+        }
+
+        .result-actions button {
+          flex: 1;
         }
       }
     </style>
@@ -233,126 +325,174 @@ const HTML_CONTENT = `<!DOCTYPE html>
     <div class="container">
       <div class="header">
         <h1>🎋 八字命盘生成器</h1>
-        <p>精准的八字排盘工具 · 基于专业天文历法计算</p>
+        <p>生成 AI 适用的 JSON 格式精准八字命盘</p>
       </div>
 
       <div class="card">
+        <div class="info-box">
+          💡 <strong>使用提示：</strong>支持公历和农历两种输入方式，选择对应的日期类型后填写准确的出生时间即可生成完整的八字命盘
+          JSON 数据。
+        </div>
+
         <form id="baziForm">
+          <!-- 日期类型选择 -->
           <div class="form-group">
-            <label>日期类型</label>
+            <label>日期类型 *</label>
             <div class="radio-group">
-              <label>
+              <label class="radio-item">
                 <input type="radio" name="dateType" value="solar" checked />
-                公历（阳历）
+                <span>公历（阳历）</span>
               </label>
-              <label>
+              <label class="radio-item">
                 <input type="radio" name="dateType" value="lunar" />
-                农历（阴历）
+                <span>农历（阴历）</span>
               </label>
             </div>
           </div>
 
-          <div class="form-group" id="solarDateGroup">
-            <label for="solarDatetime">出生时间（公历）</label>
-            <input
-              type="datetime-local"
-              id="solarDatetime"
-              name="solarDatetime"
-              required
-            />
+          <!-- 公历日期输入 -->
+          <div id="solarInputGroup" class="date-input-group active">
+            <div class="form-group">
+              <label for="solarDatetime">公历日期时间 *</label>
+              <input
+                type="datetime-local"
+                id="solarDatetime"
+                name="solarDatetime"
+                placeholder="选择公历日期和时间"
+              />
+              <div class="example-text">示例：2000年5月15日 12:00</div>
+            </div>
           </div>
 
-          <div class="form-group" id="lunarDateGroup" style="display: none">
-            <label for="lunarDatetime">出生时间（农历）</label>
-            <input
-              type="text"
-              id="lunarDatetime"
-              name="lunarDatetime"
-              placeholder="例如: 2000-05-15 12:00:00"
-            />
-            <small style="color: #666; margin-top: 5px; display: block">
-              格式: YYYY-MM-DD HH:mm:ss
-            </small>
+          <!-- 农历日期输入 -->
+          <div id="lunarInputGroup" class="date-input-group">
+            <div class="form-group">
+              <label for="lunarDatetime">农历日期时间 *</label>
+              <input
+                type="datetime-local"
+                id="lunarDatetime"
+                name="lunarDatetime"
+                placeholder="选择农历日期和时间"
+              />
+              <div class="example-text">示例：农历 2000年5月15日 12:00（注意：这里输入的是农历的年月日）</div>
+            </div>
           </div>
 
+          <!-- 性别选择 -->
           <div class="form-group">
-            <label>性别</label>
+            <label>性别 *</label>
             <div class="radio-group">
-              <label>
+              <label class="radio-item">
                 <input type="radio" name="gender" value="1" checked />
-                男
+                <span>男</span>
               </label>
-              <label>
+              <label class="radio-item">
                 <input type="radio" name="gender" value="0" />
-                女
+                <span>女</span>
               </label>
             </div>
           </div>
 
+          <!-- 早晚子时配置 -->
           <div class="form-group">
-            <label for="eightCharProviderSect">子时配置</label>
+            <label for="eightCharProviderSect">早晚子时配置</label>
             <select id="eightCharProviderSect" name="eightCharProviderSect">
               <option value="2" selected>23:00-23:59 日干支为当天（推荐）</option>
               <option value="1">23:00-23:59 日干支为明天</option>
             </select>
+            <div class="example-text">选择子时（23:00-23:59）的日干支计算方式</div>
           </div>
 
-          <button type="submit" id="submitBtn">生成八字命盘</button>
+          <!-- 按钮组 -->
+          <div class="button-group">
+            <button type="submit" class="btn-primary">🎯 生成八字命盘</button>
+            <button type="button" class="btn-secondary" onclick="resetForm()">🔄 重置表单</button>
+          </div>
         </form>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="loading">
+          <div class="loading-spinner"></div>
+          <p>正在生成命盘，请稍候...</p>
+        </div>
+
+        <!-- 错误信息 -->
+        <div id="errorMessage" class="error-message"></div>
       </div>
 
-      <div class="result" id="result">
-        <div class="card">
-          <h2>八字命盘结果</h2>
-          <div id="resultContent"></div>
+      <!-- 结果显示区域 -->
+      <div id="resultSection" class="card result-section">
+        <div class="result-header">
+          <h2>📋 命盘结果</h2>
+          <div class="result-actions">
+            <button class="btn-copy" onclick="copyResult()">📋 复制 JSON</button>
+            <button class="btn-download" onclick="downloadResult()">💾 下载 JSON</button>
+          </div>
         </div>
+        <pre id="jsonOutput" class="json-output"></pre>
+      </div>
+
+      <div class="footer">
+        <p>
+          Powered by Herald Yu |
+          <a href="https://github.com/yuhr123" target="_blank">GitHub</a>
+        </p>
       </div>
     </div>
 
     <script>
-      const form = document.getElementById('baziForm');
-      const result = document.getElementById('result');
-      const resultContent = document.getElementById('resultContent');
-      const submitBtn = document.getElementById('submitBtn');
-      const dateTypeRadios = document.querySelectorAll('input[name="dateType"]');
-      const solarDateGroup = document.getElementById('solarDateGroup');
-      const lunarDateGroup = document.getElementById('lunarDateGroup');
+      let currentResult = null;
 
       // 日期类型切换
-      dateTypeRadios.forEach((radio) => {
+      document.querySelectorAll('input[name="dateType"]').forEach((radio) => {
         radio.addEventListener('change', (e) => {
-          if (e.target.value === 'solar') {
-            solarDateGroup.style.display = 'block';
-            lunarDateGroup.style.display = 'none';
-          } else {
-            solarDateGroup.style.display = 'none';
-            lunarDateGroup.style.display = 'block';
-          }
+          const dateType = e.target.value;
+          document.getElementById('solarInputGroup').classList.toggle('active', dateType === 'solar');
+          document.getElementById('lunarInputGroup').classList.toggle('active', dateType === 'lunar');
         });
       });
 
       // 表单提交
-      form.addEventListener('submit', async (e) => {
+      document.getElementById('baziForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData(form);
+        // 隐藏之前的结果和错误
+        hideError();
+        hideResult();
+
+        const formData = new FormData(e.target);
         const dateType = formData.get('dateType');
-        const data = {
+        const gender = formData.get('gender');
+        const eightCharProviderSect = formData.get('eightCharProviderSect');
+
+        let requestData = {
           dateType,
-          solarDatetime: dateType === 'solar' ? formData.get('solarDatetime') : undefined,
-          lunarDatetime: dateType === 'lunar' ? formData.get('lunarDatetime') : undefined,
-          gender: parseInt(formData.get('gender')),
-          eightCharProviderSect: parseInt(formData.get('eightCharProviderSect')),
+          gender: Number(gender),
+          eightCharProviderSect: Number(eightCharProviderSect),
         };
 
-        // 转换公历时间格式
-        if (data.dateType === 'solar' && data.solarDatetime) {
-          data.solarDatetime = new Date(data.solarDatetime).toISOString();
+        // 根据日期类型构建请求数据
+        if (dateType === 'solar') {
+          const solarDatetime = document.getElementById('solarDatetime').value;
+          if (!solarDatetime) {
+            showError('请选择公历日期时间');
+            return;
+          }
+          // 转换为 ISO 格式，添加时区信息（保持本地时间不变）
+          // datetime-local 的值格式为: "YYYY-MM-DDTHH:mm"
+          requestData.solarDatetime = solarDatetime + ':00+08:00';
+        } else {
+          const lunarDatetime = document.getElementById('lunarDatetime').value;
+          if (!lunarDatetime) {
+            showError('请选择农历日期时间');
+            return;
+          }
+          // 农历时间格式转换：从 "YYYY-MM-DDTHH:mm" 转为 "YYYY-MM-DD HH:mm:ss"
+          requestData.lunarDatetime = lunarDatetime.replace('T', ' ') + ':00';
         }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = '生成中...';
-        result.classList.remove('show');
+        // 显示加载状态
+        showLoading();
 
         try {
           const response = await fetch('/api/bazi', {
@@ -360,78 +500,124 @@ const HTML_CONTENT = `<!DOCTYPE html>
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(requestData),
           });
 
-          const result_data = await response.json();
+          const result = await response.json();
 
-          if (result_data.success) {
-            displayResult(result_data.data);
-            result.classList.add('show');
+          if (result.success) {
+            currentResult = result.data;
+            showResult(result.data);
           } else {
-            resultContent.innerHTML = \`<div class="error">\${result_data.error}</div>\`;
-            result.classList.add('show');
+            showError(result.error || '生成命盘失败，请检查输入信息');
           }
         } catch (error) {
-          resultContent.innerHTML = \`<div class="error">请求失败: \${error.message}</div>\`;
-          result.classList.add('show');
+          console.error('请求失败:', error);
+          showError('网络请求失败，请检查服务器连接');
         } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = '生成八字命盘';
+          hideLoading();
         }
       });
 
-      function displayResult(data) {
-        let html = \`
-          <div class="bazi-info">
-            <div class="info-item"><strong>性别:</strong> \${data.性别}</div>
-            <div class="info-item"><strong>阳历:</strong> \${data.阳历}</div>
-            <div class="info-item"><strong>农历:</strong> \${data.农历}</div>
-            <div class="info-item"><strong>生肖:</strong> \${data.生肖}</div>
-            <div class="info-item"><strong>八字:</strong> \${data.八字}</div>
-            <div class="info-item"><strong>日主:</strong> \${data.日主}</div>
-          </div>
+      // 显示结果
+      function showResult(data) {
+        const jsonOutput = document.getElementById('jsonOutput');
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+        document.getElementById('resultSection').classList.add('show');
 
-          <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">四柱详情</h3>
-          <div class="pillars">
-            <div class="pillar">
-              <h3>年柱</h3>
-              <div class="pillar-char">\${data.年柱.天干.天干}\${data.年柱.地支.地支}</div>
-              <div>\${data.年柱.纳音}</div>
-            </div>
-            <div class="pillar">
-              <h3>月柱</h3>
-              <div class="pillar-char">\${data.月柱.天干.天干}\${data.月柱.地支.地支}</div>
-              <div>\${data.月柱.纳音}</div>
-            </div>
-            <div class="pillar">
-              <h3>日柱</h3>
-              <div class="pillar-char">\${data.日柱.天干.天干}\${data.日柱.地支.地支}</div>
-              <div>\${data.日柱.纳音}</div>
-            </div>
-            <div class="pillar">
-              <h3>时柱</h3>
-              <div class="pillar-char">\${data.时柱.天干.天干}\${data.时柱.地支.地支}</div>
-              <div>\${data.时柱.纳音}</div>
-            </div>
-          </div>
-        \`;
-
-        if (data.神煞) {
-          html += \`
-            <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">神煞</h3>
-            <div class="bazi-info">
-          \`;
-          for (const [key, value] of Object.entries(data.神煞)) {
-            if (Array.isArray(value) && value.length > 0) {
-              html += \`<div class="info-item"><strong>\${key}:</strong> \${value.join('、')}</div>\`;
-            }
-          }
-          html += \`</div>\`;
-        }
-
-        resultContent.innerHTML = html;
+        // 滚动到结果区域
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
+
+      // 隐藏结果
+      function hideResult() {
+        document.getElementById('resultSection').classList.remove('show');
+      }
+
+      // 显示错误
+      function showError(message) {
+        const errorElement = document.getElementById('errorMessage');
+        errorElement.textContent = '❌ ' + message;
+        errorElement.classList.add('show');
+      }
+
+      // 隐藏错误
+      function hideError() {
+        document.getElementById('errorMessage').classList.remove('show');
+      }
+
+      // 显示加载状态
+      function showLoading() {
+        document.getElementById('loading').classList.add('show');
+        document.querySelector('.btn-primary').disabled = true;
+      }
+
+      // 隐藏加载状态
+      function hideLoading() {
+        document.getElementById('loading').classList.remove('show');
+        document.querySelector('.btn-primary').disabled = false;
+      }
+
+      // 复制结果
+      function copyResult() {
+        if (!currentResult) return;
+
+        const jsonString = JSON.stringify(currentResult, null, 2);
+        navigator.clipboard
+          .writeText(jsonString)
+          .then(() => {
+            alert('✅ JSON 数据已复制到剪贴板！');
+          })
+          .catch((err) => {
+            console.error('复制失败:', err);
+            alert('❌ 复制失败，请手动选择文本复制');
+          });
+      }
+
+      // 下载结果
+      function downloadResult() {
+        if (!currentResult) return;
+
+        const jsonString = JSON.stringify(currentResult, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        // 生成文件名：八字_性别_日期时间.json
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const bazi = currentResult['八字'] || 'bazi';
+        const gender = currentResult['性别'] || '';
+        a.download = \`八字命盘_\${bazi.replace(/\\s/g, '_')}_\${gender}_\${timestamp}.json\`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // 重置表单
+      function resetForm() {
+        document.getElementById('baziForm').reset();
+        hideError();
+        hideResult();
+        currentResult = null;
+        // 重置日期类型显示
+        document.getElementById('solarInputGroup').classList.add('active');
+        document.getElementById('lunarInputGroup').classList.remove('active');
+      }
+
+      // 页面加载时设置当前日期时间
+      window.addEventListener('DOMContentLoaded', () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+
+        document.getElementById('solarDatetime').value = \`\${year}-\${month}-\${day}T\${hour}:\${minute}\`;
+      });
     </script>
   </body>
 </html>
