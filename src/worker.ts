@@ -1,14 +1,138 @@
 import { getBaziDetail, getChineseCalendar, getSolarTimes } from './index.js';
 
-// HTML 页面内容
+// 静态资源内容
 const HTML_CONTENT = `<!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>八字命盘生成器</title>
-    <style>
-      * {
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎋 八字命盘生成器</h1>
+        <p>生成 AI 适用的 JSON 格式精准八字命盘</p>
+      </div>
+
+      <div class="card">
+        <div class="info-box">
+          💡 <strong>使用提示：</strong>支持公历和农历两种输入方式，选择对应的日期类型后填写准确的出生时间即可生成完整的八字命盘
+          JSON 数据。
+        </div>
+
+        <form id="baziForm">
+          <!-- 日期类型选择 -->
+          <div class="form-group">
+            <label>日期类型 *</label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="dateType" value="solar" checked />
+                <span>公历（阳历）</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="dateType" value="lunar" />
+                <span>农历（阴历）</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 公历日期输入 -->
+          <div id="solarInputGroup" class="date-input-group active">
+            <div class="form-group">
+              <label for="solarDatetime">公历日期时间 *</label>
+              <input
+                type="datetime-local"
+                id="solarDatetime"
+                name="solarDatetime"
+                placeholder="选择公历日期和时间"
+              />
+              <div class="example-text">示例：2000年5月15日 12:00</div>
+            </div>
+          </div>
+
+          <!-- 农历日期输入 -->
+          <div id="lunarInputGroup" class="date-input-group">
+            <div class="form-group">
+              <label for="lunarDatetime">农历日期时间 *</label>
+              <input
+                type="datetime-local"
+                id="lunarDatetime"
+                name="lunarDatetime"
+                placeholder="选择农历日期和时间"
+              />
+              <div class="example-text">示例：农历 2000年5月15日 12:00（注意：这里输入的是农历的年月日）</div>
+            </div>
+          </div>
+
+          <!-- 性别选择 -->
+          <div class="form-group">
+            <label>性别 *</label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="gender" value="1" checked />
+                <span>男</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="gender" value="0" />
+                <span>女</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 早晚子时配置 -->
+          <div class="form-group">
+            <label for="eightCharProviderSect">早晚子时配置</label>
+            <select id="eightCharProviderSect" name="eightCharProviderSect">
+              <option value="2" selected>23:00-23:59 日干支为当天（推荐）</option>
+              <option value="1">23:00-23:59 日干支为明天</option>
+            </select>
+            <div class="example-text">选择子时（23:00-23:59）的日干支计算方式</div>
+          </div>
+
+          <!-- 按钮组 -->
+          <div class="button-group">
+            <button type="submit" class="btn-primary">🎯 生成八字命盘</button>
+            <button type="button" class="btn-secondary" onclick="resetForm()">🔄 重置表单</button>
+          </div>
+        </form>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="loading">
+          <div class="loading-spinner"></div>
+          <p>正在生成命盘，请稍候...</p>
+        </div>
+
+        <!-- 错误信息 -->
+        <div id="errorMessage" class="error-message"></div>
+      </div>
+
+      <!-- 结果显示区域 -->
+      <div id="resultSection" class="card result-section">
+        <div class="result-header">
+          <h2>📋 命盘结果</h2>
+          <div class="result-actions">
+            <button class="btn-copy" onclick="copyResult()">📋 复制 JSON</button>
+            <button class="btn-download" onclick="downloadResult()">💾 下载 JSON</button>
+          </div>
+        </div>
+        <pre id="jsonOutput" class="json-output"></pre>
+      </div>
+
+      <div class="footer">
+        <p>
+          <a href="https://github.com/yuhr123/bazi" target="_blank">GitHub 仓库</a>
+        </p>
+      </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+  </body>
+</html>
+`;
+
+const CSS_CONTENT = `* {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -318,129 +442,9 @@ const HTML_CONTENT = `<!DOCTYPE html>
         .result-actions button {
           flex: 1;
         }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>🎋 八字命盘生成器</h1>
-        <p>生成 AI 适用的 JSON 格式精准八字命盘</p>
-      </div>
+      }`;
 
-      <div class="card">
-        <div class="info-box">
-          💡 <strong>使用提示：</strong>支持公历和农历两种输入方式，选择对应的日期类型后填写准确的出生时间即可生成完整的八字命盘
-          JSON 数据。
-        </div>
-
-        <form id="baziForm">
-          <!-- 日期类型选择 -->
-          <div class="form-group">
-            <label>日期类型 *</label>
-            <div class="radio-group">
-              <label class="radio-item">
-                <input type="radio" name="dateType" value="solar" checked />
-                <span>公历（阳历）</span>
-              </label>
-              <label class="radio-item">
-                <input type="radio" name="dateType" value="lunar" />
-                <span>农历（阴历）</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- 公历日期输入 -->
-          <div id="solarInputGroup" class="date-input-group active">
-            <div class="form-group">
-              <label for="solarDatetime">公历日期时间 *</label>
-              <input
-                type="datetime-local"
-                id="solarDatetime"
-                name="solarDatetime"
-                placeholder="选择公历日期和时间"
-              />
-              <div class="example-text">示例：2000年5月15日 12:00</div>
-            </div>
-          </div>
-
-          <!-- 农历日期输入 -->
-          <div id="lunarInputGroup" class="date-input-group">
-            <div class="form-group">
-              <label for="lunarDatetime">农历日期时间 *</label>
-              <input
-                type="datetime-local"
-                id="lunarDatetime"
-                name="lunarDatetime"
-                placeholder="选择农历日期和时间"
-              />
-              <div class="example-text">示例：农历 2000年5月15日 12:00（注意：这里输入的是农历的年月日）</div>
-            </div>
-          </div>
-
-          <!-- 性别选择 -->
-          <div class="form-group">
-            <label>性别 *</label>
-            <div class="radio-group">
-              <label class="radio-item">
-                <input type="radio" name="gender" value="1" checked />
-                <span>男</span>
-              </label>
-              <label class="radio-item">
-                <input type="radio" name="gender" value="0" />
-                <span>女</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- 早晚子时配置 -->
-          <div class="form-group">
-            <label for="eightCharProviderSect">早晚子时配置</label>
-            <select id="eightCharProviderSect" name="eightCharProviderSect">
-              <option value="2" selected>23:00-23:59 日干支为当天（推荐）</option>
-              <option value="1">23:00-23:59 日干支为明天</option>
-            </select>
-            <div class="example-text">选择子时（23:00-23:59）的日干支计算方式</div>
-          </div>
-
-          <!-- 按钮组 -->
-          <div class="button-group">
-            <button type="submit" class="btn-primary">🎯 生成八字命盘</button>
-            <button type="button" class="btn-secondary" onclick="resetForm()">🔄 重置表单</button>
-          </div>
-        </form>
-
-        <!-- 加载状态 -->
-        <div id="loading" class="loading">
-          <div class="loading-spinner"></div>
-          <p>正在生成命盘，请稍候...</p>
-        </div>
-
-        <!-- 错误信息 -->
-        <div id="errorMessage" class="error-message"></div>
-      </div>
-
-      <!-- 结果显示区域 -->
-      <div id="resultSection" class="card result-section">
-        <div class="result-header">
-          <h2>📋 命盘结果</h2>
-          <div class="result-actions">
-            <button class="btn-copy" onclick="copyResult()">📋 复制 JSON</button>
-            <button class="btn-download" onclick="downloadResult()">💾 下载 JSON</button>
-          </div>
-        </div>
-        <pre id="jsonOutput" class="json-output"></pre>
-      </div>
-
-      <div class="footer">
-        <p>
-          <a href="https://github.com/yuhr123/bazi" target="_blank">GitHub 仓库</a>
-        </p>
-      </div>
-    </div>
-
-    <script>
-      let currentResult = null;
+const JS_CONTENT = `let currentResult = null;
 
       // 日期类型切换
       document.querySelectorAll('input[name="dateType"]').forEach((radio) => {
@@ -616,11 +620,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
         const minute = String(now.getMinutes()).padStart(2, '0');
 
         document.getElementById('solarDatetime').value = \`\${year}-\${month}-\${day}T\${hour}:\${minute}\`;
-      });
-    </script>
-  </body>
-</html>
-`;
+      });`;
 
 // 处理请求
 export default {
@@ -641,11 +641,31 @@ export default {
     }
 
     try {
-      // 首页
+      // 静态资源路由
       if (path === '/' || path === '/index.html') {
         return new Response(HTML_CONTENT, {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
+            ...corsHeaders,
+          },
+        });
+      }
+
+      if (path === '/css/style.css') {
+        return new Response(CSS_CONTENT, {
+          headers: {
+            'Content-Type': 'text/css; charset=utf-8',
+            'Cache-Control': 'public, max-age=86400',
+            ...corsHeaders,
+          },
+        });
+      }
+
+      if (path === '/js/app.js') {
+        return new Response(JS_CONTENT, {
+          headers: {
+            'Content-Type': 'application/javascript; charset=utf-8',
+            'Cache-Control': 'public, max-age=86400',
             ...corsHeaders,
           },
         });
