@@ -1,8 +1,9 @@
 {
-  "name": "bazi-mcp",
+  "name": "bazi",
   "version": "0.1.0",
   "type": "module",
   "module": "./src/smithery.ts",
+  "description": "精准的八字排盘工具，提供 Web 界面和 API 服务",
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
     "@types/express": "^5.0.3",
@@ -11,14 +12,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cantian-ai/bazi-mcp.git"
+    "url": "git+https://github.com/yuhr123/bazi.git"
   },
   "keywords": [
     "bazi",
     "八字",
-    "mcp",
-    "算命",
-    "命理"
+    "命盘",
+    "排盘",
+    "命理",
+    "chinese-astrology",
+    "four-pillars"
   ],
   "license": "ISC",
   "exports": {
@@ -28,11 +31,14 @@
     "tsc": "rm -rf dist && tsc",
     "prepublishOnly": "npm run tsc && chmod +x dist/stdio.js",
     "smithery-dev": "npx @smithery/cli dev",
-    "start": "npm run tsc && node dist/httpServer.js",
     "web": "npm run tsc && node dist/webServer.js",
-    "dev:web": "tsx src/webServer.ts"
+    "dev:web": "tsx src/webServer.ts",
+    "start": "npm run web",
+    "mcp:http": "npm run tsc && node dist/httpServer.js",
+    "mcp:stdio": "./dist/stdio.js"
   },
   "bin": {
+    "bazi": "./dist/stdio.js",
     "bazi-mcp": "./dist/stdio.js"
   },
   "dependencies": {

@@ -1,81 +1,123 @@
-# Bazi MCP (八字 MCP) by Cantian AI
+# Bazi (八字命盘生成器)
 
-[![smithery badge](https://smithery.ai/badge/@cantian-ai/bazi-mcp)](https://smithery.ai/server/@cantian-ai/bazi-mcp)
-[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/453ac410-d93a-45fb-8563-7d3cccfbe956)
+精准的在线八字排盘工具，提供详细的命理分析数据。基于专业的天文历法计算，为命理研究者和爱好者提供可靠的八字信息。
 
-Unlock precise Bazi insights with the **Bazi MCP**, the first AI-powered Bazi calculator. Built to address inaccuracies in existing AI fortune-telling tools like GPT and DeepSeek, our MCP delivers reliable Bazi data for personality analysis, destiny forecasting, and more.
+### 主要特点
 
-### Why Bazi MCP?
+- **精准排盘**：基于准确的天文历法算法，提供可靠的八字数据
+- **详细信息**：包含四柱、十神、神煞、大运、刑冲合会等完整信息
+- **Web 界面**：友好的网页界面，随时随地访问使用
+- **API 服务**：提供 RESTful API 和 MCP 协议支持，方便集成
 
-- **Accurate Bazi Calculations**: Provide insightful Bazi information.
-- **AI Agent Integration**: Empowers AI agents with precise Bazi data.
-- **Community-Driven**: Join enthusiasts to advance Chinese metaphysics.
+### 功能亮点
 
-Originating from the popular [_Chinese Bazi Fortune Teller_](https://chatgpt.com/g/g-67c3f7b74d148191a2167f44fd13412d-chinese-bazi-fortune-teller-can-tian-ba-zi-suan-ming-jing-zhun-pai-pan-jie-du) GPTs in the GPT Store, this project is now integrated with **Cantian AI** ([cantian.ai](https://cantian.ai)). We invite Bazi practitioners and AI enthusiasts to collaborate, share insights, and contribute to our open-source community.
+- 支持公历/农历日期输入
+- 完整的四柱八字信息
+- 十神、纳音、神煞分析
+- 大运推算
+- 刑冲合会关系
+- 黄历查询
 
-### Get Involved
+### 在线使用
 
-- **Contact**: [support@cantian.ai](mailto:support@cantian.ai)
+访问 Web 界面直接使用：`http://localhost:8080`
+
+---
 
 ## 中文
 
-**八字 MCP**是参天 AI 推出的首个面向玄学领域的 MCP，针对 GPT 和 DeepSeek 等算命工具常出现的排盘错误，提供精准的八字数据，助力性格分析、命运预测等应用。
+**八字命盘生成器**是一个精准的八字排盘工具，提供专业的命理分析数据。采用可靠的天文历法算法，为命理研究和学习提供准确的基础数据支持。
 
-### 八字 MCP 亮点
+### 核心功能
 
-- **精准排盘**：提供全面的八字排盘信息。
-- **AI 赋能**：为 AI 智能体提供可靠八字服务。
-- **社区共建**：欢迎命理爱好者参与交流与开发。
+- **精准计算**：基于专业天文历法库，确保排盘准确性
+- **信息全面**：涵盖四柱、五行、十神、神煞、大运等完整信息  
+- **使用便捷**：提供网页界面和 API 接口两种使用方式
+- **开源免费**：代码开源，可自由部署和定制
 
-项目源于 GPT Store 热门应用[_Chinese Bazi Fortune Teller_](https://chatgpt.com/g/g-67c3f7b74d148191a2167f44fd13412d-chinese-bazi-fortune-teller-can-tian-ba-zi-suan-ming-jing-zhun-pai-pan-jie-du)，现已融入**参天 AI**平台 ([cantian.ai](https://cantian.ai))。我们诚邀命理研究者与 AI 开发者加入，共同推动中国传统文化的传承与创新。
+## 快速开始 | Quick Start
 
-### 联系我们
+### 前置需求 | Prerequisites
 
-- **邮箱**：[support@cantian.ai](mailto:support@cantian.ai)
-- **微信**：
+- Node.js 22 或以上版本
+- npm 或其他包管理器
 
-  <img src="https://github.com/user-attachments/assets/7790b64e-e03f-47e2-b824-38459549a6d8" alt="WeChat QR Code" width="200"/>
+### 安装依赖
 
-## 前置需求 ｜ Prerequisite
+```bash
+npm install
+```
 
-Node.js 22 版本或以上。
+### 启动 Web 服务
 
-Node.js 22 or above.
-
-## 开始使用 ｜ Start
-
-### 使用 Streamable HTTP 启动 | Start by Streamable HTTP transport
-
-```shell
+```bash
 npm start
 ```
 
-### 使用 Stdio 启动 ｜ Start by Stdio transport
+或者使用：
 
-配置 AI 应用（例如 Claude Descktop）。
+```bash
+npm run web
+```
 
-Configure AI application (e.g. Claude Desktop).
+访问 `http://localhost:8080` 即可使用网页界面进行八字排盘。
+
+### 开发模式
+
+```bash
+npm run dev:web
+```
+
+使用 tsx 热重载模式，方便开发调试。
+
+### API 使用
+
+Web 服务提供 RESTful API：
+
+```bash
+# 生成八字
+POST http://localhost:8080/api/bazi
+Content-Type: application/json
+
+{
+  "dateType": "solar",
+  "solarDatetime": "2000-05-15T12:00:00+08:00",
+  "gender": 1,
+  "eightCharProviderSect": 2
+}
+
+# 健康检查
+GET http://localhost:8080/api/health
+```
+
+### MCP 协议支持（可选）
+
+项目保留了 MCP (Model Context Protocol) 支持，可用于 AI 应用集成。
+
+如需在 AI 应用（如 Claude Desktop）中使用：
+
+#### HTTP 模式
+
+```bash
+npm run mcp:http
+```
+
+#### Stdio 模式
+
+在 AI 应用中配置：
 
 ```json
 {
   "mcpServers": {
     "Bazi": {
       "command": "npx",
-      "args": ["bazi-mcp"]
+      "args": ["bazi"]
     }
   }
 }
 ```
 
-### Installing via Smithery
-
-To install bazi-mcp for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@cantian-ai/bazi-mcp):
-
-```bash
-npx -y @smithery/cli install @cantian-ai/bazi-mcp --client claude
-```
-
-## 工具列表 | Tools
+## API 文档 | API Documentation
 
 ### getBaziDetail
 
@@ -452,4 +494,21 @@ npx -y @smithery/cli install @cantian-ai/bazi-mcp --client claude
 }
 ```
 
-**Keywords**: Bazi MCP, Bazi AI Agent, Fengshui AI Agent, Bazi Calculator MCP, Bazi Calculator AI, Cantian AI
+## 技术栈 | Tech Stack
+
+- **后端**: Node.js + Express + TypeScript
+- **八字计算**: tyme4ts (天文历法库)
+- **前端**: 原生 HTML/CSS/JavaScript
+- **协议支持**: HTTP API + MCP (Model Context Protocol)
+
+## 贡献 | Contributing
+
+欢迎提交 Issue 和 Pull Request！
+
+## 许可 | License
+
+ISC
+
+---
+
+**Keywords**: 八字, Bazi, 命盘, 排盘, 命理, Chinese Astrology, Four Pillars
