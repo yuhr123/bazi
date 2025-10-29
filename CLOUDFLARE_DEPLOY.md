@@ -2,150 +2,119 @@
 
 本项目支持部署到 Cloudflare Workers，实现全球边缘网络加速访问。
 
-## 部署方式
+## 🚀 快速开始（3 分钟）
 
-### 方式一：使用 Wrangler CLI（推荐）
+### 前提条件
 
-这是最简单直接的部署方式。
+- ✅ Node.js 22+ 已安装
+- ✅ Cloudflare 账号（免费即可，[注册地址](https://dash.cloudflare.com/sign-up)）
 
-#### 1. 安装依赖
+### 一键部署
 
 ```bash
+# 1. 安装依赖（如果还没安装）
 npm install
-```
 
-#### 2. 登录 Cloudflare
-
-```bash
+# 2. 登录 Cloudflare
 npx wrangler login
-```
 
-这会打开浏览器让你授权 Wrangler 访问你的 Cloudflare 账号。
-
-#### 3. 配置 wrangler.toml
-
-编辑 `wrangler.toml` 文件，确认或修改配置：
-
-```toml
-name = "bazi"  # 你的 Worker 名称
-main = "src/worker.ts"
-compatibility_date = "2024-10-01"
-compatibility_flags = ["nodejs_compat"]
-```
-
-#### 4. 部署到 Cloudflare
-
-```bash
+# 3. 部署
 npm run cf:deploy
 ```
 
-或者直接使用：
-
-```bash
-npx wrangler deploy
+部署成功后，你会看到类似这样的输出：
+```
+✨ Deployment complete!
+🌐 https://bazi.your-username.workers.dev
 ```
 
-部署成功后，Wrangler 会显示你的 Worker URL，例如：
-```
-https://bazi.your-subdomain.workers.dev
-```
-
-#### 5. 本地测试（可选）
-
-在部署之前，可以本地测试：
-
-```bash
-npm run cf:dev
-```
-
-这会启动本地开发服务器，访问 `http://localhost:8787`
+**就这么简单！** 访问上面的 URL 即可使用。
 
 ---
 
-### 方式二：通过 Cloudflare Dashboard
+## 📋 三种部署方式
 
-如果你更喜欢使用 Web 界面：
+### 方式 1: 命令行部署（推荐）⭐
 
-#### 1. 构建项目
+**适用场景**: 快速部署、手动控制
 
 ```bash
-npm run build:worker
+# 首次部署
+npx wrangler login
+npm run cf:deploy
+
+# 后续更新
+npm run cf:deploy
 ```
 
-#### 2. 登录 Cloudflare Dashboard
+**优点**: 
+- 最快速直接
+- 本地完全控制
+- 适合开发调试
 
-访问 https://dash.cloudflare.com/ 并登录
+### 方式 2: GitHub 自动部署（推荐长期使用）🔄
 
-#### 3. 创建 Worker
+**适用场景**: 团队协作、CI/CD
 
-1. 进入 "Workers & Pages" 部分
-2. 点击 "Create Application"
-3. 选择 "Create Worker"
-4. 给 Worker 命名（例如：bazi）
-5. 点击 "Deploy"
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. 进入 **Workers & Pages** → **Create Application** → **Pages**
+3. 点击 **Connect to Git**
+4. 选择你的 GitHub 仓库 `yuhr123/bazi`
+5. 配置构建设置：
+   - **构建命令**: `npm run build:worker`
+   - **输出目录**: `dist`
+   - **根目录**: `/`
+6. 点击 **Save and Deploy**
 
-#### 4. 上传代码
+**优点**:
+- ✅ 推送代码自动部署
+- ✅ 每次提交都有部署记录
+- ✅ 支持预览部署（Preview Deployments）
+- ✅ 零手动操作
 
-创建完成后：
-1. 点击 "Quick Edit" 或进入 Worker 编辑界面
-2. 删除默认代码
-3. 复制 `dist/worker.js` 的内容
-4. 粘贴到编辑器
-5. 点击 "Save and Deploy"
+**完成后**: 每次 push 到 GitHub，Cloudflare 自动部署最新版本！
+
+### 方式 3: Dashboard 手动部署
+
+**适用场景**: 临时测试、不想用命令行
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. **Workers & Pages** → **Create Application** → **Create Worker**
+3. 给 Worker 命名（如 `bazi`）
+4. 本地运行 `npm run build:worker`
+5. 复制 `dist/worker.js` 的内容
+6. 粘贴到 Cloudflare 编辑器
+7. 点击 **Save and Deploy**
+
+**优点**: 可视化操作，适合非技术用户
 
 ---
 
-### 方式三：GitHub Actions 自动部署
+## ⚙️ 自定义配置
 
-创建 `.github/workflows/deploy.yml`：
+### 修改 Worker 名称
 
-```yaml
-name: Deploy to Cloudflare Workers
+编辑 `wrangler.toml`:
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Build
-        run: npm run build:worker
-        
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+```toml
+name = "your-project-name"  # 改成你想要的名字
 ```
 
-然后在 GitHub 仓库设置中添加 `CLOUDFLARE_API_TOKEN` secret。
+重新部署即可。
 
----
+### 绑定自定义域名
 
-## 配置自定义域名
+#### 方法 1: Dashboard（推荐）
 
-### 1. 在 Cloudflare Dashboard 中
+1. 确保域名在 Cloudflare 托管
+2. 进入你的 Worker 设置
+3. **Triggers** 标签 → **Add Custom Domain**
+4. 输入域名（如 `bazi.yourdomain.com`）
+5. 点击 **Add Domain**
 
-1. 进入你的 Worker
-2. 点击 "Triggers" 标签
-3. 点击 "Add Custom Domain"
-4. 输入你的域名（需要已在 Cloudflare 托管）
-5. 点击 "Add Custom Domain"
+Cloudflare 会自动配置 DNS 和 SSL。
 
-### 2. 在 wrangler.toml 中配置
+#### 方法 2: wrangler.toml
 
 ```toml
 routes = [
@@ -153,114 +122,208 @@ routes = [
 ]
 ```
 
-然后重新部署：
+### 环境变量
 
-```bash
-npm run cf:deploy
-```
-
----
-
-## 环境变量配置
-
-如果需要配置环境变量，在 `wrangler.toml` 中添加：
+如需配置环境变量，在 `wrangler.toml` 中添加：
 
 ```toml
 [vars]
 MY_VARIABLE = "production_value"
 ```
 
-或通过命令行设置 secret：
+或使用 secrets（敏感信息）：
 
 ```bash
 npx wrangler secret put MY_SECRET
+# 会提示输入密钥值
 ```
 
 ---
 
-## 注意事项
+## 🔧 本地开发与测试
 
-### Cloudflare Workers 限制
-
-1. **免费套餐限制**：
-   - 每天 100,000 次请求
-   - CPU 时间：每次请求 10ms（免费）/ 50ms（付费）
-   - 内存：128MB
-   - 脚本大小：1MB（压缩后）
-
-2. **兼容性**：
-   - 项目使用了 `nodejs_compat` 标志来支持 Node.js API
-   - 某些 Node.js 模块可能不完全兼容
-   - 如遇到问题，可能需要调整依赖或使用 polyfill
-
-3. **冷启动**：
-   - Workers 可能会有冷启动时间
-   - 首次请求可能较慢
-
-### 与 GitHub 集成
-
-如果你的代码在 GitHub 上：
-
-1. Cloudflare 支持直接连接 GitHub 仓库
-2. 可以实现自动部署
-3. 在 Dashboard 中选择 "Workers & Pages" → "Create Application" → "Pages" → "Connect to Git"
-
----
-
-## 故障排查
-
-### 部署失败
+### 启动本地开发服务器
 
 ```bash
-# 查看详细日志
-npx wrangler deploy --verbose
-
-# 验证配置
-npx wrangler whoami
+npm run cf:dev
 ```
 
-### 运行时错误
+访问 http://localhost:8787 查看效果。
+
+**特点**:
+- 热重载（修改代码自动刷新）
+- 模拟 Cloudflare Workers 环境
+- 支持断点调试
+
+### 查看部署日志
 
 ```bash
-# 查看实时日志
 npx wrangler tail
-
-# 查看特定 Worker 的日志
-npx wrangler tail bazi
 ```
 
-### 依赖问题
-
-如果某些 npm 包在 Workers 中不兼容：
-
-1. 检查 Cloudflare Workers 文档的兼容性说明
-2. 考虑使用 Web 标准 API 替代
-3. 或使用轻量级的替代包
+实时查看 Worker 的运行日志，方便调试。
 
 ---
 
-## 监控和分析
+## 📊 免费额度说明
 
-Cloudflare 提供了 Workers 的分析面板：
+Cloudflare Workers **免费套餐**：
 
-1. 访问 Dashboard
-2. 进入你的 Worker
-3. 查看 "Metrics" 标签
-4. 可以看到请求量、错误率、CPU 时间等
+| 项目 | 额度 |
+|-----|------|
+| 请求数 | 每天 100,000 次 |
+| CPU 时间 | 每次请求 10ms |
+| 流量 | 无限制 |
+| SSL | 自动 HTTPS |
+| 全球节点 | 300+ 边缘节点 |
 
----
-
-## 成本估算
-
-- **免费套餐**：每天 100,000 次请求
-- **付费套餐**：$5/月起，包含 1000 万次请求
-
-对于个人使用或小型项目，免费套餐完全够用。
+**对个人项目完全够用！** 超出后按量计费，价格很低：
+- $5/月：1000 万次请求
+- 每百万次额外请求：$0.50
 
 ---
 
-## 更多资源
+## ❓ 常见问题
 
-- [Cloudflare Workers 文档](https://developers.cloudflare.com/workers/)
+### 1. 部署失败：权限错误
+
+**问题**: `Error: Authentication error`
+
+**解决**:
+```bash
+npx wrangler logout
+npx wrangler login
+```
+
+### 2. 部署失败：编译错误
+
+**问题**: TypeScript 编译失败
+
+**解决**:
+```bash
+npm run tsc
+# 查看错误，修复后重试
+npm run cf:deploy
+```
+
+### 3. 访问 404
+
+**问题**: Worker URL 返回 404
+
+**可能原因**:
+- Worker 名称冲突
+- 部署未完成
+
+**解决**:
+```bash
+# 查看 Worker 列表
+npx wrangler list
+
+# 查看特定 Worker 状态
+npx wrangler status
+```
+
+### 4. 如何回滚版本？
+
+在 Cloudflare Dashboard:
+1. 进入你的 Worker
+2. **Deployments** 标签
+3. 找到之前的版本
+4. 点击 **Rollback**
+
+### 5. 如何查看使用量？
+
+Dashboard → **Workers & Pages** → 选择你的 Worker → **Metrics**
+
+可以看到：
+- 请求数
+- 错误率
+- CPU 时间
+- 流量统计
+
+### 6. 本地测试报错怎么办？
+
+```bash
+# 清理缓存重试
+rm -rf .wrangler
+npm run cf:dev
+```
+
+---
+
+## 🎯 部署最佳实践
+
+### 开发流程
+
+```bash
+# 1. 修改代码
+vim public/css/style.css
+
+# 2. 本地测试
+npm run dev:web          # Web 服务器
+# 或
+npm run cf:dev           # Workers 环境
+
+# 3. 同步静态资源（如果修改了 HTML/CSS/JS）
+npm run sync:worker
+
+# 4. 部署
+npm run cf:deploy
+```
+
+### 生产环境建议
+
+1. **使用 GitHub 自动部署**: 代码 push 即部署
+2. **绑定自定义域名**: 更专业
+3. **监控使用量**: 避免超出免费额度
+4. **定期查看日志**: 及时发现问题
+
+### 版本管理
+
+利用 Git 标签管理版本：
+
+```bash
+# 标记版本
+git tag v1.0.0
+git push origin v1.0.0
+
+# 部署特定版本
+git checkout v1.0.0
+npm run cf:deploy
+```
+
+---
+
+## 🔒 安全注意事项
+
+1. **不要提交 secrets**: 使用 `wrangler secret` 管理敏感信息
+2. **API 限流**: 考虑添加速率限制
+3. **CORS 配置**: 生产环境建议限制来源
+4. **日志脱敏**: 不要记录敏感信息
+
+---
+
+## 📚 相关资源
+
+- [Cloudflare Workers 官方文档](https://developers.cloudflare.com/workers/)
 - [Wrangler CLI 文档](https://developers.cloudflare.com/workers/wrangler/)
 - [Workers 示例](https://developers.cloudflare.com/workers/examples/)
+- [社区讨论](https://discord.gg/cloudflaredev)
+
+---
+
+## 🆘 获取帮助
+
+遇到问题？
+
+1. 查看本文档的[常见问题](#-常见问题)部分
+2. 运行 `npx wrangler tail` 查看实时日志
+3. 查看 [GitHub Issues](https://github.com/yuhr123/bazi/issues)
+4. Cloudflare Workers 社区很活跃，可以在 Discord 提问
+
+---
+
+## 📝 更新日志
+
+- **2024-10**: 添加资源拆分支持，优化部署流程
+- **2024-10**: 初始版本，支持 Cloudflare Workers 部署
