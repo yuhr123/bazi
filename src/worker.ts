@@ -434,8 +434,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
 
       <div class="footer">
         <p>
-          Powered by Herald Yu |
-          <a href="https://github.com/yuhr123" target="_blank">GitHub</a>
+          <a href="https://github.com/yuhr123/bazi" target="_blank">GitHub 仓库</a>
         </p>
       </div>
     </div>
@@ -589,6 +588,39 @@ const HTML_CONTENT = `<!DOCTYPE html>
         const bazi = currentResult['八字'] || 'bazi';
         const gender = currentResult['性别'] || '';
         a.download = \`八字命盘_\${bazi.replace(/\\s/g, '_')}_\${gender}_\${timestamp}.json\`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // 重置表单
+      function resetForm() {
+        document.getElementById('baziForm').reset();
+        hideError();
+        hideResult();
+        currentResult = null;
+        // 重置日期类型显示
+        document.getElementById('solarInputGroup').classList.add('active');
+        document.getElementById('lunarInputGroup').classList.remove('active');
+      }
+
+      // 页面加载时设置当前日期时间
+      window.addEventListener('DOMContentLoaded', () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+
+        document.getElementById('solarDatetime').value = \`\${year}-\${month}-\${day}T\${hour}:\${minute}\`;
+      });
+    </script>
+  </body>
+</html>
+`;
 
         document.body.appendChild(a);
         a.click();
