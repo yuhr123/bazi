@@ -1,0 +1,22 @@
+name = "bazi"
+main = "src/worker.ts"
+compatibility_date = "2024-10-01"
+
+# 兼容性标志
+compatibility_flags = ["nodejs_compat"]
+
+# 构建配置
+[build]
+command = "npm run build:worker"
+
+# 环境变量（如果需要）
+# [vars]
+# MY_VARIABLE = "production_value"
+
+# 开发配置
+[env.dev]
+name = "bazi-dev"
+
+# 生产配置
+[env.production]
+name = "bazi"

@@ -22,6 +22,20 @@
 
 访问 Web 界面直接使用：`http://localhost:8080`
 
+### 部署到云端
+
+支持部署到 Cloudflare Workers，实现全球边缘网络加速：
+
+```bash
+# 登录 Cloudflare
+npx wrangler login
+
+# 部署
+npm run cf:deploy
+```
+
+详细部署指南请查看 [CLOUDFLARE_DEPLOY.md](./CLOUDFLARE_DEPLOY.md)
+
 ---
 
 ## 中文

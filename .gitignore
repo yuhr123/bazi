@@ -3,3 +3,8 @@ node_modules
 .npmrc
 .env
 .DS_Store
+
+# Wrangler
+.wrangler/
+.dev.vars
+wrangler.toml.local
