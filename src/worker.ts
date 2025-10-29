@@ -622,39 +622,6 @@ const HTML_CONTENT = `<!DOCTYPE html>
 </html>
 `;
 
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-
-      // 重置表单
-      function resetForm() {
-        document.getElementById('baziForm').reset();
-        hideError();
-        hideResult();
-        currentResult = null;
-        // 重置日期类型显示
-        document.getElementById('solarInputGroup').classList.add('active');
-        document.getElementById('lunarInputGroup').classList.remove('active');
-      }
-
-      // 页面加载时设置当前日期时间
-      window.addEventListener('DOMContentLoaded', () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hour = String(now.getHours()).padStart(2, '0');
-        const minute = String(now.getMinutes()).padStart(2, '0');
-
-        document.getElementById('solarDatetime').value = \`\${year}-\${month}-\${day}T\${hour}:\${minute}\`;
-      });
-    </script>
-  </body>
-</html>
-`;
-
 // 处理请求
 export default {
   async fetch(request: Request): Promise<Response> {
@@ -686,7 +653,7 @@ export default {
 
       // API: 生成八字
       if (path === '/api/bazi' && request.method === 'POST') {
-        const body = await request.json();
+        const body = (await request.json()) as any;
         const { dateType, solarDatetime, lunarDatetime, gender, eightCharProviderSect } = body;
 
         // 验证输入
@@ -777,9 +744,9 @@ export default {
 
       // API: 获取黄历
       if (path === '/api/calendar' && request.method === 'POST') {
-        const body = await request.json();
+        const body = (await request.json()) as any;
         const { solarDatetime } = body;
-        const calendar = await getChineseCalendar({ solarDatetime });
+        const calendar = await getChineseCalendar(solarDatetime);
         return new Response(
           JSON.stringify({
             success: true,
@@ -793,7 +760,7 @@ export default {
 
       // API: 根据八字获取可能的阳历时间
       if (path === '/api/solar-times' && request.method === 'POST') {
-        const body = await request.json();
+        const body = (await request.json()) as any;
         const { bazi } = body;
         const solarTimes = await getSolarTimes({ bazi });
         return new Response(
