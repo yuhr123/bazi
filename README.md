@@ -59,7 +59,9 @@
 
 ### 在线试用
 
-部署后访问：`https://bazi.你的域名.workers.dev`
+**演示地址**: [https://bazi.jianbao.org](https://bazi.jianbao.org)
+
+无需安装，立即体验！
 
 ### 本地运行
 
