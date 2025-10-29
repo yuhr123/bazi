@@ -28,7 +28,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "tsc": "rm -rf dist && tsc",
+    "tsc": "rm -rf dist && npx tsc",
     "prepublishOnly": "npm run tsc && chmod +x dist/stdio.js",
     "smithery-dev": "npx @smithery/cli dev",
     "web": "npm run tsc && node dist/webServer.js",
