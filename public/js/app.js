@@ -127,26 +127,46 @@ function formatToMarkdown(data) {
     const xchh = data['刑冲合会'];
     md += `## 🔄 刑冲合会\n\n`;
 
-    const relationships = [
-      { key: '三会', name: '三会', emoji: '🔺' },
-      { key: '三合', name: '三合', emoji: '🔷' },
-      { key: '六合', name: '六合', emoji: '💠' },
-      { key: '六冲', name: '六冲', emoji: '⚡' },
-      { key: '相刑', name: '相刑', emoji: '⚠️' },
-      { key: '相害', name: '相害', emoji: '🚫' },
-      { key: '自刑', name: '自刑', emoji: '🔁' },
-    ];
+    // 添加调试信息 - 查看实际的数据结构
+    console.log('刑冲合会数据：', xchh);
+    console.log('刑冲合会键列表：', Object.keys(xchh));
 
-    relationships.forEach((rel) => {
-      const items = xchh[rel.key];
-      if (items && items.length > 0) {
-        md += `### ${rel.emoji} ${rel.name}\n\n`;
+    // 尝试直接遍历所有键
+    const allKeys = Object.keys(xchh);
+    let hasContent = false;
+
+    allKeys.forEach((key) => {
+      const items = xchh[key];
+      console.log(`键 "${key}" 的值:`, items, '类型:', typeof items, '是否为数组:', Array.isArray(items));
+
+      if (items && Array.isArray(items) && items.length > 0) {
+        hasContent = true;
+        md += `### 📌 ${key}\n\n`;
         items.forEach((item) => {
           md += `- ${item}\n`;
         });
         md += `\n`;
+      } else if (items && typeof items === 'object' && !Array.isArray(items)) {
+        // 如果是对象，尝试展开
+        const subKeys = Object.keys(items);
+        if (subKeys.length > 0) {
+          hasContent = true;
+          md += `### 📌 ${key}\n\n`;
+          subKeys.forEach((subKey) => {
+            const subItems = items[subKey];
+            if (Array.isArray(subItems) && subItems.length > 0) {
+              md += `**${subKey}**: ${subItems.join('、')}\n\n`;
+            } else if (subItems) {
+              md += `**${subKey}**: ${subItems}\n\n`;
+            }
+          });
+        }
       }
     });
+
+    if (!hasContent) {
+      md += `*暂无刑冲合会信息*\n\n`;
+    }
   }
 
   // 底部
