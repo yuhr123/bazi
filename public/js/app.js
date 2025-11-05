@@ -8,6 +8,12 @@ function formatToMarkdown(data) {
   // 标题
   md += `# 八字命盘\n\n`;
 
+  // 如果有生成时间，显示在顶部
+  if (data['生成时间']) {
+    const timestamp = new Date(data['生成时间']).toLocaleString('zh-CN');
+    md += `> **生成时间**: ${timestamp}\n\n`;
+  }
+
   // 基本信息
   md += `## 📋 基本信息\n\n`;
   md += `| 项目 | 信息 |\n`;

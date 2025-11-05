@@ -110,6 +110,7 @@ export const buildBazi = (options: { lunarHour: LunarHour; eightCharProviderSect
   const eightChar = lunarHour.getEightChar();
   const me = eightChar.getDay().getHeavenStem();
   return {
+    生成时间: new Date().toISOString(),
     性别: ['女', '男'][gender],
     阳历: lunarHour.getSolarTime().toString(),
     农历: lunarHour.toString(),
