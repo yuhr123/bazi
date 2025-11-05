@@ -522,12 +522,6 @@ function formatToMarkdown(data) {
   // 标题
   md += \`# 八字命盘\\n\\n\`;
 
-  // 如果有生成时间，显示在顶部
-  if (data['生成时间']) {
-    const timestamp = new Date(data['生成时间']).toLocaleString('zh-CN');
-    md += \`> **生成时间**: \${timestamp}\\n\\n\`;
-  }
-
   // 基本信息
   md += \`## 📋 基本信息\\n\\n\`;
   md += \`| 项目 | 信息 |\\n\`;
@@ -731,9 +725,19 @@ function formatToMarkdown(data) {
     }
   }
 
-  // 底部
-  md += \`---\\n\`;
-  md += \`*生成时间: \${new Date().toLocaleString('zh-CN')}*\\n\`;
+  // 附加信息
+  if (data['附加信息']) {
+    md += \`---\\n\`;
+    const info = data['附加信息'];
+    if (info['生成时间']) {
+      const timestamp = new Date(info['生成时间']).toLocaleString('zh-CN');
+      md += \`*生成时间: \${timestamp}*\\n\`;
+    }
+    // 未来可以在这里添加版权信息等其他附加信息
+    // if (info['版权信息']) {
+    //   md += \`*\${info['版权信息']}*\\n\`;
+    // }
+  }
 
   return md;
 }
