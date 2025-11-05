@@ -127,6 +127,37 @@ function formatToMarkdown(data) {
     const xchh = data['刑冲合会'];
     md += `## 🔄 刑冲合会\n\n`;
 
+    // 辅助函数：递归提取对象中的所有文本值
+    const extractValues = (obj) => {
+      if (obj === null || obj === undefined) return [];
+
+      // 如果是字符串，直接返回
+      if (typeof obj === 'string') return [obj];
+
+      // 如果是数组，递归处理每个元素
+      if (Array.isArray(obj)) {
+        const results = [];
+        obj.forEach(item => {
+          const extracted = extractValues(item);
+          results.push(...extracted);
+        });
+        return results;
+      }
+
+      // 如果是对象，递归处理所有值
+      if (typeof obj === 'object') {
+        const results = [];
+        Object.keys(obj).forEach(key => {
+          const extracted = extractValues(obj[key]);
+          results.push(...extracted);
+        });
+        return results;
+      }
+
+      // 其他类型转为字符串
+      return [String(obj)];
+    };
+
     // 辅助函数：将关系对象转换为字符串
     const formatRelations = (relObj) => {
       if (!relObj || typeof relObj !== 'object') return '';
@@ -134,10 +165,12 @@ function formatToMarkdown(data) {
       const relations = [];
       Object.keys(relObj).forEach((key) => {
         const value = relObj[key];
-        if (Array.isArray(value) && value.length > 0) {
-          relations.push(`${key}: ${value.join('、')}`);
-        } else if (value && typeof value === 'string') {
-          relations.push(`${key}: ${value}`);
+
+        // 提取所有文本值
+        const values = extractValues(value);
+
+        if (values.length > 0) {
+          relations.push(`${key}: ${values.join('、')}`);
         }
       });
       return relations.join(' | ');
