@@ -13,13 +13,12 @@ const HTML_CONTENT = `<!DOCTYPE html>
     <div class="container">
       <div class="header">
         <h1>🎋 八字命盘生成器</h1>
-        <p>生成 AI 适用的 JSON 格式精准八字命盘</p>
+        <p>生成精准八字命盘 · 支持 JSON 和 Markdown 两种格式</p>
       </div>
 
       <div class="card">
         <div class="info-box">
-          💡 <strong>使用提示：</strong>支持公历和农历两种输入方式，选择对应的日期类型后填写准确的出生时间即可生成完整的八字命盘
-          JSON 数据。
+          💡 <strong>使用提示：</strong>支持公历和农历两种输入方式，选择对应的日期类型后填写准确的出生时间即可生成完整的八字命盘。生成后可切换 JSON 或 Markdown 格式查看，方便复制、下载或分享。
         </div>
 
         <form id="baziForm">
@@ -112,12 +111,26 @@ const HTML_CONTENT = `<!DOCTYPE html>
       <div id="resultSection" class="card result-section">
         <div class="result-header">
           <h2>📋 命盘结果</h2>
+          <div class="format-selector">
+            <label class="format-radio">
+              <input type="radio" name="outputFormat" value="json" checked onchange="switchFormat('json')" />
+              <span>JSON</span>
+            </label>
+            <label class="format-radio">
+              <input type="radio" name="outputFormat" value="markdown" onchange="switchFormat('markdown')" />
+              <span>Markdown</span>
+            </label>
+          </div>
           <div class="result-actions">
-            <button class="btn-copy" onclick="copyResult()">📋 复制 JSON</button>
-            <button class="btn-download" onclick="downloadResult()">💾 下载 JSON</button>
+            <button class="btn-copy" onclick="copyResult()">
+              <span id="copyButtonText">📋 复制</span>
+            </button>
+            <button class="btn-download" onclick="downloadResult()">
+              <span id="downloadButtonText">💾 下载</span>
+            </button>
           </div>
         </div>
-        <pre id="jsonOutput" class="json-output"></pre>
+        <pre id="jsonOutput" class="output-display"></pre>
       </div>
 
       <div class="footer">
@@ -301,16 +314,53 @@ const CSS_CONTENT = `* {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
       }
 
       .result-header h2 {
         color: #667eea;
         font-size: 1.5em;
+        margin: 0;
+      }
+
+      .format-selector {
+        display: flex;
+        gap: 10px;
+        background: #f5f5f5;
+        padding: 5px;
+        border-radius: 8px;
+      }
+
+      .format-radio {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 5px 15px;
+        border-radius: 6px;
+        transition: all 0.3s;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .format-radio:hover {
+        background: #e0e0e0;
+      }
+
+      .format-radio input[type='radio'] {
+        margin-right: 6px;
+        cursor: pointer;
+      }
+
+      .format-radio input[type='radio']:checked + span {
+        color: #667eea;
+        font-weight: 600;
       }
 
       .result-actions {
         display: flex;
         gap: 10px;
+        margin-left: auto;
       }
 
       .result-actions button {
@@ -319,7 +369,7 @@ const CSS_CONTENT = `* {
         font-size: 14px;
       }
 
-      .json-output {
+      .output-display {
         background: #1e1e1e;
         color: #d4d4d4;
         padding: 20px;
@@ -330,6 +380,18 @@ const CSS_CONTENT = `* {
         overflow-x: auto;
         max-height: 600px;
         overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .output-display.markdown-mode {
+        background: #ffffff;
+        color: #333;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+          'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.8;
+        border: 1px solid #e0e0e0;
       }
 
       .error-message {
@@ -435,8 +497,14 @@ const CSS_CONTENT = `* {
           gap: 15px;
         }
 
+        .format-selector {
+          width: 100%;
+          justify-content: center;
+        }
+
         .result-actions {
           width: 100%;
+          margin-left: 0;
         }
 
         .result-actions button {
@@ -445,6 +513,230 @@ const CSS_CONTENT = `* {
       }`;
 
 const JS_CONTENT = `let currentResult = null;
+let currentFormat = 'json'; // 当前显示格式：'json' 或 'markdown'
+
+// 将八字数据转换为 Markdown 格式
+function formatToMarkdown(data) {
+  let md = '';
+
+  // 标题
+  md += \`# 八字命盘\\n\\n\`;
+
+  // 如果有生成时间，显示在顶部
+  if (data['生成时间']) {
+    const timestamp = new Date(data['生成时间']).toLocaleString('zh-CN');
+    md += \`> **生成时间**: \${timestamp}\\n\\n\`;
+  }
+
+  // 基本信息
+  md += \`## 📋 基本信息\\n\\n\`;
+  md += \`| 项目 | 信息 |\\n\`;
+  md += \`|------|------|\\n\`;
+  md += \`| **性别** | \${data['性别'] || ''} |\\n\`;
+  md += \`| **公历** | \${data['阳历'] || ''} |\\n\`;
+  md += \`| **农历** | \${data['农历'] || ''} |\\n\`;
+  md += \`| **八字** | \${data['八字'] || ''} |\\n\`;
+  md += \`| **生肖** | \${data['生肖'] || ''} |\\n\`;
+  md += \`| **日主** | \${data['日主'] || ''} |\\n\`;
+  md += \`\\n\`;
+
+  // 四柱信息
+  md += \`## 🎋 四柱详解\\n\\n\`;
+  const pillars = [
+    { key: '年柱', name: '年柱', emoji: '🌸' },
+    { key: '月柱', name: '月柱', emoji: '🌺' },
+    { key: '日柱', name: '日柱', emoji: '🌻' },
+    { key: '时柱', name: '时柱', emoji: '🌼' },
+  ];
+
+  pillars.forEach((pillar) => {
+    const pillarData = data[pillar.key];
+    if (pillarData) {
+      md += \`### \${pillar.emoji} \${pillar.name}\\n\\n\`;
+      md += \`| 属性 | 值 |\\n\`;
+      md += \`|------|----|\\n\`;
+
+      // 处理天干和地支（它们是嵌套对象）
+      const tianGan = pillarData['天干']?.['天干'] || '';
+      const diZhi = pillarData['地支']?.['地支'] || '';
+      md += \`| **干支** | \${tianGan}\${diZhi} |\\n\`;
+
+      // 五行（组合天干和地支的五行）
+      const tianGanWuXing = pillarData['天干']?.['五行'] || '';
+      const diZhiWuXing = pillarData['地支']?.['五行'] || '';
+      md += \`| **五行** | \${tianGanWuXing}\${diZhiWuXing} |\\n\`;
+
+      // 纳音
+      md += \`| **纳音** | \${pillarData['纳音'] || ''} |\\n\`;
+
+      // 十神（天干的十神）
+      const shiShen = pillarData['天干']?.['十神'] || '日主';
+      md += \`| **十神** | \${shiShen} |\\n\`;
+
+      // 藏干信息（地支藏干是对象格式：主气、中气、余气）
+      const cangGan = pillarData['地支']?.['藏干'];
+      if (cangGan) {
+        const cangGanList = [];
+        if (cangGan['主气']) {
+          cangGanList.push(\`\${cangGan['主气']['天干']}(\${cangGan['主气']['十神']})\`);
+        }
+        if (cangGan['中气']) {
+          cangGanList.push(\`\${cangGan['中气']['天干']}(\${cangGan['中气']['十神']})\`);
+        }
+        if (cangGan['余气']) {
+          cangGanList.push(\`\${cangGan['余气']['天干']}(\${cangGan['余气']['十神']})\`);
+        }
+        if (cangGanList.length > 0) {
+          md += \`| **藏干** | \${cangGanList.join('、')} |\\n\`;
+        }
+      }
+
+      // 旬空
+      if (pillarData['空亡']) {
+        md += \`| **旬空** | \${pillarData['空亡']} |\\n\`;
+      }
+
+      // 星运和自坐
+      if (pillarData['星运']) {
+        md += \`| **星运** | \${pillarData['星运']} |\\n\`;
+      }
+      if (pillarData['自坐']) {
+        md += \`| **自坐** | \${pillarData['自坐']} |\\n\`;
+      }
+
+      md += \`\\n\`;
+    }
+  });
+
+  // 神煞信息
+  if (data['神煞']) {
+    md += \`## ⭐ 神煞\\n\\n\`;
+    const shensha = data['神煞'];
+    pillars.forEach((pillar) => {
+      const ss = shensha[pillar.key];
+      if (ss && ss.length > 0) {
+        md += \`**\${pillar.name}**: \${ss.join('、')}\\n\\n\`;
+      }
+    });
+  }
+
+  // 大运信息
+  if (data['大运']) {
+    const dayun = data['大运'];
+    md += \`## 🔮 大运\\n\\n\`;
+    md += \`- **起运日期**: \${dayun['起运日期'] || ''}\\n\`;
+    md += \`- **起运年龄**: \${dayun['起运年龄'] || ''}\\n\\n\`;
+
+    if (dayun['大运'] && Array.isArray(dayun['大运'])) {
+      md += \`| 序号 | 年龄范围 | 干支 | 天干十神 | 地支藏干 |\\n\`;
+      md += \`|------|----------|------|----------|----------|\\n\`;
+      dayun['大运'].forEach((dy, index) => {
+        const age = \`\${dy['开始年龄']}-\${dy['结束年龄']}岁\`;
+        const ganzhi = dy['干支'] || '';
+        const tianGanShiShen = dy['天干十神'] || '';
+        // 地支藏干是数组，需要合并
+        const diZhiCangGan = dy['地支藏干'] ? dy['地支藏干'].join('') : '';
+        md += \`| \${index + 1} | \${age} | \${ganzhi} | \${tianGanShiShen} | \${diZhiCangGan} |\\n\`;
+      });
+      md += \`\\n\`;
+    }
+  }
+
+  // 刑冲合会
+  if (data['刑冲合会']) {
+    const xchh = data['刑冲合会'];
+    md += \`## 🔄 刑冲合会\\n\\n\`;
+
+    // 辅助函数：递归提取对象中的所有文本值
+    const extractValues = (obj) => {
+      if (obj === null || obj === undefined) return [];
+
+      // 如果是字符串，直接返回
+      if (typeof obj === 'string') return [obj];
+
+      // 如果是数组，递归处理每个元素
+      if (Array.isArray(obj)) {
+        const results = [];
+        obj.forEach(item => {
+          const extracted = extractValues(item);
+          results.push(...extracted);
+        });
+        return results;
+      }
+
+      // 如果是对象，递归处理所有值
+      if (typeof obj === 'object') {
+        const results = [];
+        Object.keys(obj).forEach(key => {
+          const extracted = extractValues(obj[key]);
+          results.push(...extracted);
+        });
+        return results;
+      }
+
+      // 其他类型转为字符串
+      return [String(obj)];
+    };
+
+    // 辅助函数：将关系对象转换为字符串
+    const formatRelations = (relObj) => {
+      if (!relObj || typeof relObj !== 'object') return '';
+
+      const relations = [];
+      Object.keys(relObj).forEach((key) => {
+        const value = relObj[key];
+
+        // 提取所有文本值
+        const values = extractValues(value);
+
+        if (values.length > 0) {
+          relations.push(\`\${key}: \${values.join('、')}\`);
+        }
+      });
+      return relations.join(' | ');
+    };
+
+    // 收集所有关系信息
+    const pillars = [
+      { key: '年', name: '年柱', emoji: '🌸' },
+      { key: '月', name: '月柱', emoji: '🌺' },
+      { key: '日', name: '日柱', emoji: '🌻' },
+      { key: '时', name: '时柱', emoji: '🌼' },
+    ];
+
+    let hasContent = false;
+
+    pillars.forEach((pillar) => {
+      const pillarData = xchh[pillar.key];
+      if (pillarData && typeof pillarData === 'object') {
+        const tianGanRel = formatRelations(pillarData['天干']);
+        const diZhiRel = formatRelations(pillarData['地支']);
+
+        if (tianGanRel || diZhiRel) {
+          hasContent = true;
+          md += \`### \${pillar.emoji} \${pillar.name}\\n\\n\`;
+
+          if (tianGanRel) {
+            md += \`**天干关系**: \${tianGanRel}\\n\\n\`;
+          }
+          if (diZhiRel) {
+            md += \`**地支关系**: \${diZhiRel}\\n\\n\`;
+          }
+        }
+      }
+    });
+
+    if (!hasContent) {
+      md += \`*暂无刑冲合会信息*\\n\\n\`;
+    }
+  }
+
+  // 底部
+  md += \`---\\n\`;
+  md += \`*生成时间: \${new Date().toLocaleString('zh-CN')}*\\n\`;
+
+  return md;
+}
 
       // 日期类型切换
       document.querySelectorAll('input[name="dateType"]').forEach((radio) => {
@@ -522,10 +814,31 @@ const JS_CONTENT = `let currentResult = null;
         }
       });
 
+      // 切换格式
+      function switchFormat(format) {
+        currentFormat = format;
+        if (currentResult) {
+          updateDisplay();
+        }
+      }
+
+      // 更新显示
+      function updateDisplay() {
+        const outputElement = document.getElementById('jsonOutput');
+
+        if (currentFormat === 'markdown') {
+          const markdown = formatToMarkdown(currentResult);
+          outputElement.textContent = markdown;
+          outputElement.classList.add('markdown-mode');
+        } else {
+          outputElement.textContent = JSON.stringify(currentResult, null, 2);
+          outputElement.classList.remove('markdown-mode');
+        }
+      }
+
       // 显示结果
       function showResult(data) {
-        const jsonOutput = document.getElementById('jsonOutput');
-        jsonOutput.textContent = JSON.stringify(data, null, 2);
+        updateDisplay();
         document.getElementById('resultSection').classList.add('show');
 
         // 滚动到结果区域
@@ -565,11 +878,19 @@ const JS_CONTENT = `let currentResult = null;
       function copyResult() {
         if (!currentResult) return;
 
-        const jsonString = JSON.stringify(currentResult, null, 2);
+        let content, successMessage;
+        if (currentFormat === 'markdown') {
+          content = formatToMarkdown(currentResult);
+          successMessage = '✅ Markdown 数据已复制到剪贴板！';
+        } else {
+          content = JSON.stringify(currentResult, null, 2);
+          successMessage = '✅ JSON 数据已复制到剪贴板！';
+        }
+
         navigator.clipboard
-          .writeText(jsonString)
+          .writeText(content)
           .then(() => {
-            alert('✅ JSON 数据已复制到剪贴板！');
+            alert(successMessage);
           })
           .catch((err) => {
             console.error('复制失败:', err);
@@ -581,17 +902,27 @@ const JS_CONTENT = `let currentResult = null;
       function downloadResult() {
         if (!currentResult) return;
 
-        const jsonString = JSON.stringify(currentResult, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
+        let content, mimeType, extension;
+        if (currentFormat === 'markdown') {
+          content = formatToMarkdown(currentResult);
+          mimeType = 'text/markdown';
+          extension = 'md';
+        } else {
+          content = JSON.stringify(currentResult, null, 2);
+          mimeType = 'application/json';
+          extension = 'json';
+        }
+
+        const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
 
-        // 生成文件名：八字_性别_日期时间.json
+        // 生成文件名：八字_性别_日期时间.扩展名
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
         const bazi = currentResult['八字'] || 'bazi';
         const gender = currentResult['性别'] || '';
-        a.download = \`八字命盘_\${bazi.replace(/\\s/g, '_')}_\${gender}_\${timestamp}.json\`;
+        a.download = \`八字命盘_\${bazi.replace(/\\s/g, '_')}_\${gender}_\${timestamp}.\${extension}\`;
 
         document.body.appendChild(a);
         a.click();
@@ -605,9 +936,12 @@ const JS_CONTENT = `let currentResult = null;
         hideError();
         hideResult();
         currentResult = null;
+        currentFormat = 'json';
         // 重置日期类型显示
         document.getElementById('solarInputGroup').classList.add('active');
         document.getElementById('lunarInputGroup').classList.remove('active');
+        // 重置格式选择
+        document.querySelector('input[name="outputFormat"][value="json"]').checked = true;
       }
 
       // 页面加载时设置当前日期时间
