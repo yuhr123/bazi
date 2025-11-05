@@ -127,39 +127,48 @@ function formatToMarkdown(data) {
     const xchh = data['刑冲合会'];
     md += `## 🔄 刑冲合会\n\n`;
 
-    // 添加调试信息 - 查看实际的数据结构
-    console.log('刑冲合会数据：', xchh);
-    console.log('刑冲合会键列表：', Object.keys(xchh));
+    // 辅助函数：将关系对象转换为字符串
+    const formatRelations = (relObj) => {
+      if (!relObj || typeof relObj !== 'object') return '';
 
-    // 尝试直接遍历所有键
-    const allKeys = Object.keys(xchh);
+      const relations = [];
+      Object.keys(relObj).forEach((key) => {
+        const value = relObj[key];
+        if (Array.isArray(value) && value.length > 0) {
+          relations.push(`${key}: ${value.join('、')}`);
+        } else if (value && typeof value === 'string') {
+          relations.push(`${key}: ${value}`);
+        }
+      });
+      return relations.join(' | ');
+    };
+
+    // 收集所有关系信息
+    const pillars = [
+      { key: '年', name: '年柱', emoji: '🌸' },
+      { key: '月', name: '月柱', emoji: '🌺' },
+      { key: '日', name: '日柱', emoji: '🌻' },
+      { key: '时', name: '时柱', emoji: '🌼' },
+    ];
+
     let hasContent = false;
 
-    allKeys.forEach((key) => {
-      const items = xchh[key];
-      console.log(`键 "${key}" 的值:`, items, '类型:', typeof items, '是否为数组:', Array.isArray(items));
+    pillars.forEach((pillar) => {
+      const pillarData = xchh[pillar.key];
+      if (pillarData && typeof pillarData === 'object') {
+        const tianGanRel = formatRelations(pillarData['天干']);
+        const diZhiRel = formatRelations(pillarData['地支']);
 
-      if (items && Array.isArray(items) && items.length > 0) {
-        hasContent = true;
-        md += `### 📌 ${key}\n\n`;
-        items.forEach((item) => {
-          md += `- ${item}\n`;
-        });
-        md += `\n`;
-      } else if (items && typeof items === 'object' && !Array.isArray(items)) {
-        // 如果是对象，尝试展开
-        const subKeys = Object.keys(items);
-        if (subKeys.length > 0) {
+        if (tianGanRel || diZhiRel) {
           hasContent = true;
-          md += `### 📌 ${key}\n\n`;
-          subKeys.forEach((subKey) => {
-            const subItems = items[subKey];
-            if (Array.isArray(subItems) && subItems.length > 0) {
-              md += `**${subKey}**: ${subItems.join('、')}\n\n`;
-            } else if (subItems) {
-              md += `**${subKey}**: ${subItems}\n\n`;
-            }
-          });
+          md += `### ${pillar.emoji} ${pillar.name}\n\n`;
+
+          if (tianGanRel) {
+            md += `**天干关系**: ${tianGanRel}\n\n`;
+          }
+          if (diZhiRel) {
+            md += `**地支关系**: ${diZhiRel}\n\n`;
+          }
         }
       }
     });
