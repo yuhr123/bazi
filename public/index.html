@@ -109,12 +109,26 @@
       <div id="resultSection" class="card result-section">
         <div class="result-header">
           <h2>📋 命盘结果</h2>
+          <div class="format-selector">
+            <label class="format-radio">
+              <input type="radio" name="outputFormat" value="json" checked onchange="switchFormat('json')" />
+              <span>JSON</span>
+            </label>
+            <label class="format-radio">
+              <input type="radio" name="outputFormat" value="markdown" onchange="switchFormat('markdown')" />
+              <span>Markdown</span>
+            </label>
+          </div>
           <div class="result-actions">
-            <button class="btn-copy" onclick="copyResult()">📋 复制 JSON</button>
-            <button class="btn-download" onclick="downloadResult()">💾 下载 JSON</button>
+            <button class="btn-copy" onclick="copyResult()">
+              <span id="copyButtonText">📋 复制</span>
+            </button>
+            <button class="btn-download" onclick="downloadResult()">
+              <span id="downloadButtonText">💾 下载</span>
+            </button>
           </div>
         </div>
-        <pre id="jsonOutput" class="json-output"></pre>
+        <pre id="jsonOutput" class="output-display"></pre>
       </div>
 
       <div class="footer">
