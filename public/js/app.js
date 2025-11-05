@@ -35,20 +35,53 @@ function formatToMarkdown(data) {
       md += `### ${pillar.emoji} ${pillar.name}\n\n`;
       md += `| 属性 | 值 |\n`;
       md += `|------|----|\n`;
-      md += `| **干支** | ${pillarData['天干'] || ''}${pillarData['地支'] || ''} |\n`;
-      md += `| **五行** | ${pillarData['五行'] || ''} |\n`;
-      md += `| **纳音** | ${pillarData['纳音'] || ''} |\n`;
-      md += `| **十神** | ${pillarData['十神'] || ''} |\n`;
 
-      // 藏干信息
-      if (pillarData['藏干'] && Array.isArray(pillarData['藏干'])) {
-        const cangGan = pillarData['藏干'].map((cg) => `${cg['天干']}(${cg['十神']})`).join('、');
-        md += `| **藏干** | ${cangGan} |\n`;
+      // 处理天干和地支（它们是嵌套对象）
+      const tianGan = pillarData['天干']?.['天干'] || '';
+      const diZhi = pillarData['地支']?.['地支'] || '';
+      md += `| **干支** | ${tianGan}${diZhi} |\n`;
+
+      // 五行（组合天干和地支的五行）
+      const tianGanWuXing = pillarData['天干']?.['五行'] || '';
+      const diZhiWuXing = pillarData['地支']?.['五行'] || '';
+      md += `| **五行** | ${tianGanWuXing}${diZhiWuXing} |\n`;
+
+      // 纳音
+      md += `| **纳音** | ${pillarData['纳音'] || ''} |\n`;
+
+      // 十神（天干的十神）
+      const shiShen = pillarData['天干']?.['十神'] || '日主';
+      md += `| **十神** | ${shiShen} |\n`;
+
+      // 藏干信息（地支藏干是对象格式：主气、中气、余气）
+      const cangGan = pillarData['地支']?.['藏干'];
+      if (cangGan) {
+        const cangGanList = [];
+        if (cangGan['主气']) {
+          cangGanList.push(`${cangGan['主气']['天干']}(${cangGan['主气']['十神']})`);
+        }
+        if (cangGan['中气']) {
+          cangGanList.push(`${cangGan['中气']['天干']}(${cangGan['中气']['十神']})`);
+        }
+        if (cangGan['余气']) {
+          cangGanList.push(`${cangGan['余气']['天干']}(${cangGan['余气']['十神']})`);
+        }
+        if (cangGanList.length > 0) {
+          md += `| **藏干** | ${cangGanList.join('、')} |\n`;
+        }
       }
 
-      // 地支关系
-      if (pillarData['地支关系'] && pillarData['地支关系'].length > 0) {
-        md += `| **地支关系** | ${pillarData['地支关系'].join('、')} |\n`;
+      // 旬空
+      if (pillarData['空亡']) {
+        md += `| **旬空** | ${pillarData['空亡']} |\n`;
+      }
+
+      // 星运和自坐
+      if (pillarData['星运']) {
+        md += `| **星运** | ${pillarData['星运']} |\n`;
+      }
+      if (pillarData['自坐']) {
+        md += `| **自坐** | ${pillarData['自坐']} |\n`;
       }
 
       md += `\n`;
@@ -75,13 +108,15 @@ function formatToMarkdown(data) {
     md += `- **起运年龄**: ${dayun['起运年龄'] || ''}\n\n`;
 
     if (dayun['大运'] && Array.isArray(dayun['大运'])) {
-      md += `| 序号 | 年龄范围 | 干支 | 五行 | 十神 | 旬空 |\n`;
-      md += `|------|----------|------|------|------|------|\n`;
+      md += `| 序号 | 年龄范围 | 干支 | 天干十神 | 地支藏干 |\n`;
+      md += `|------|----------|------|----------|----------|\n`;
       dayun['大运'].forEach((dy, index) => {
         const age = `${dy['开始年龄']}-${dy['结束年龄']}岁`;
-        const ganzhi = `${dy['天干']}${dy['地支']}`;
-        const xunkong = dy['旬空'] ? dy['旬空'].join('、') : '';
-        md += `| ${index + 1} | ${age} | ${ganzhi} | ${dy['五行'] || ''} | ${dy['十神'] || ''} | ${xunkong} |\n`;
+        const ganzhi = dy['干支'] || '';
+        const tianGanShiShen = dy['天干十神'] || '';
+        // 地支藏干是数组，需要合并
+        const diZhiCangGan = dy['地支藏干'] ? dy['地支藏干'].join('') : '';
+        md += `| ${index + 1} | ${age} | ${ganzhi} | ${tianGanShiShen} | ${diZhiCangGan} |\n`;
       });
       md += `\n`;
     }
